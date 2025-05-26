@@ -102,7 +102,7 @@ target_include_directories(Arcantha PUBLIC
     ${GLFW_SOURCE_DIR}/include        # GLFW headers
     ${GLAD_SOURCE_DIR}/include        # GLAD headers
     ${OPENAL_SOFT_SOURCE_DIR}/include # OpenAL Soft headers
-    ${STB_DIR}                        # stb_image headers
+    ${STB_DIR}                        # stb_image header
     ${GLM_SOURCE_DIR}                 # GLM headers
     ${BOX2D_SOURCE_DIR}/include       # box2d headers
 )

@@ -14,19 +14,23 @@ set(BOX2D_DOXYGEN_SOURCES
     "docs/references.md"
     "docs/FAQ.md")
 
-# Format the source list into a Doxyfile INPUT value that Doxygen can parse
+set(BOX2D_DOXYGEN_INPUT "") # Initialize to empty string
 foreach(path IN LISTS BOX2D_DOXYGEN_SOURCES)
-    set(BOX2D_DOXYGEN_INPUT "${BOX2D_DOXYGEN_INPUT} \\\n\"${CMAKE_SOURCE_DIR}/${path}\"")
+    string(APPEND BOX2D_DOXYGEN_INPUT " \\\n\"${CMAKE_SOURCE_DIR}/${path}\"")
 endforeach()
 
-# https://cmake.org/cmake/help/latest/command/configure_file.html
-configure_file(Doxyfile.in Doxyfile @ONLY)
+# Use a unique Doxyfile name and output directory for Box2D
+configure_file(Doxyfile.in "${CMAKE_BINARY_DIR}/Doxyfile-box2d" @ONLY) # Unique Doxyfile
 
-add_custom_target(docs ALL "${DOXYGEN_EXECUTABLE}"
-                  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/docs"
-                  COMMENT "Generating HTML documentation" VERBATIM)
+# Define a unique build directory for Box2D docs
+set(BOX2D_DOCS_BUILD_DIR "${CMAKE_BINARY_DIR}/docs-box2d")
+file(MAKE_DIRECTORY "${BOX2D_DOCS_BUILD_DIR}") # Ensure directory exists
+
+add_custom_target(box2d_docs ALL "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/Doxyfile-box2d" # Pass the unique Doxyfile
+                  WORKING_DIRECTORY "${BOX2D_DOCS_BUILD_DIR}" # Doxygen works from its output directory
+                  COMMENT "Generating Box2D HTML documentation" VERBATIM) # Unique target name
 
 install(
-  DIRECTORY "${CMAKE_BINARY_DIR}/docs/html"
-  DESTINATION "${CMAKE_INSTALL_DOCDIR}"
+    DIRECTORY "${BOX2D_DOCS_BUILD_DIR}/html" # Install from unique path
+    DESTINATION "${CMAKE_INSTALL_DOCDIR}/box2d" # Unique installation subdirectory
 )
