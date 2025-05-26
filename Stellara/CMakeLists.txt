@@ -34,6 +34,26 @@ add_subdirectory(${OPENAL_SOFT_SOURCE_DIR})
 set(BOX2D_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/Box2D")
 add_subdirectory(${BOX2D_SOURCE_DIR})
 
+# --- stb_image Setup ---
+set(STB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/stb")
+# No add_library or add_subdirectory for stb_image as it's a single header with implementation in one .cpp
+
+# --- GLM Setup ---
+set(GLM_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/glm-1.0.1")
+# No add_library or add_subdirectory for GLM as it's header-only
+
+# --- Dear ImGui Setup ---
+set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/imgui-1.91.9b")
+# List all ImGui source files you've placed in your external/imgui directory
+set(IMGUI_SOURCES
+    "${IMGUI_DIR}/imgui.cpp"
+    "${IMGUI_DIR}/imgui_draw.cpp"
+    "${IMGUI_DIR}/imgui_widgets.cpp"
+    "${IMGUI_DIR}/imgui_tables.cpp"
+    "${IMGUI_DIR}/backends/imgui_impl_glfw.cpp"
+    "${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp"
+)
+
 # --- Executable Setup ---
 add_executable(Stellara
     src/main.cpp
@@ -45,11 +65,18 @@ target_link_libraries(Stellara PRIVATE glfw glad OpenAL Box2D) # The target name
 
 # Tell the compiler to look for headers in your project's include directory
 target_include_directories(Stellara PRIVATE
-    ${STELLARA_INCLUDE_DIR}
-    ${GLFW_SOURCE_DIR}/include # GLFW headers
-    ${GLAD_SOURCE_DIR}/include # GLAD headers
-    ${OPENAL_SOFT_SOURCE_DIR}/include # OpenAL headers (usually just 'AL/al.h', 'AL/alc.h')
+    ${STELLARA_INCLUDE_DIR}           # Your project's headers
+    ${GLFW_SOURCE_DIR}/include        # GLFW headers
+    ${GLAD_SOURCE_DIR}/include        # GLAD headers
+    ${OPENAL_SOFT_SOURCE_DIR}/include # OpenAL Soft headers
+    ${STB_DIR}                        # stb_image headers
+    ${GLM_SOURCE_DIR}                 # GLM headers
+    "${IMGUI_DIR}"                    # ImGui core headers (where imgui.h, imconfig.h, imgui_internal.h are)
+    "${IMGUI_DIR}/backends"           # ImGui backend headers
 )
+
+# Ensure stb_image is defined
+target_compile_definitions(Stellara PRIVATE STB_IMAGE_IMPLEMENTATION)
 
 # Optional: Set C++ standard (e.g., C++17)
 set_property(TARGET Stellara PROPERTY CXX_STANDARD 17)
