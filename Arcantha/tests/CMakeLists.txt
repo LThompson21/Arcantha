@@ -40,9 +40,9 @@ target_include_directories(test_stb_image PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/.
 
 
 # Test GLM (Header-only, no explicit linking needed, just include path)
-# add_executable(test_glm test_glm.cpp)
+add_executable(test_glm test_glm.cpp)
 # Similar to stb_image, GLM's include path should be handled.
-# target_include_directories(test_glm PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../external/glm-1.0.1")
+target_include_directories(test_glm PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../external/glm-1.0.1")
 
 
 # Test ImGui
@@ -65,6 +65,6 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # Optional: Set C++ standard for tests
-set_property(TARGET test_glfw test_glad test_openal test_box2d test_stb_image PROPERTY CXX_STANDARD 17) # test_glm test_imgui
-set_property(TARGET test_glfw test_glad test_openal test_box2d test_stb_image PROPERTY CXX_STANDARD_REQUIRED ON) # test_glm test_imgui
-set_property(TARGET test_glfw test_glad test_openal test_box2d test_stb_image PROPERTY CXX_EXTENSIONS OFF) # test_glm test_imgui
+set_property(TARGET test_glfw test_glad test_openal test_box2d test_stb_image test_glm PROPERTY CXX_STANDARD 17) # test_imgui
+set_property(TARGET test_glfw test_glad test_openal test_box2d test_stb_image test_glm PROPERTY CXX_STANDARD_REQUIRED ON) # test_imgui
+set_property(TARGET test_glfw test_glad test_openal test_box2d test_stb_image test_glm PROPERTY CXX_EXTENSIONS OFF) # test_imgui
