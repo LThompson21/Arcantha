@@ -2,6 +2,21 @@
 cmake_minimum_required(VERSION 3.10)
 project(Stellara LANGUAGES CXX)
 
+# Stellara/
+# ├── CMakeLists.txt
+# ├── external/
+# │   ├── box2d-3.1.0/
+# │   ├── glad/
+# │   ├── glfw-3.4/
+# │   ├── glm-1.0.1/
+# │   ├── imgui-1.91.9b/
+# │   ├── openal-soft-1.24.0/
+# │   └── stb/
+# ├── src/
+# │   ├── cpp/
+# │   ├── include/
+# │   └── main.cpp
+
 # Define the source and include directories for your project
 set(STELLARA_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/cpp")
 set(STELLARA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/include")
@@ -31,7 +46,7 @@ set(ALSOFT_EMBED_CORE_DATA ON CACHE BOOL "" FORCE) # Embed default configuration
 add_subdirectory(${OPENAL_SOFT_SOURCE_DIR})
 
 # --- Box2D Setup ---
-set(BOX2D_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/Box2D")
+set(BOX2D_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/box2d-3.1.0")
 add_subdirectory(${BOX2D_SOURCE_DIR})
 
 # --- stb_image Setup ---
@@ -54,14 +69,21 @@ set(IMGUI_SOURCES
     "${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp"
 )
 
+# Create a static library for ImGui
+add_library(ImGui STATIC ${IMGUI_SOURCES})
+target_include_directories(ImGui PUBLIC
+    "${IMGUI_DIR}"
+    "${IMGUI_DIR}/backends"
+)
+
 # --- Executable Setup ---
 add_executable(Stellara
     src/main.cpp
     ${STELLARA_SRC_DIR}/source.cpp # Example: Add other source files here
 )
 
-# Link GLFW, GLAD, and OpenAL to your executable
-target_link_libraries(Stellara PRIVATE glfw glad OpenAL Box2D) # The target name from OpenAL Soft's CMake is typically 'OpenAL'
+# Link GLFW, GLAD, OpenAL, Box2D, and ImGui to your executable
+target_link_libraries(Stellara PRIVATE glfw glad OpenAL Box2D ImGui)
 
 # Tell the compiler to look for headers in your project's include directory
 target_include_directories(Stellara PRIVATE
@@ -71,8 +93,6 @@ target_include_directories(Stellara PRIVATE
     ${OPENAL_SOFT_SOURCE_DIR}/include # OpenAL Soft headers
     ${STB_DIR}                        # stb_image headers
     ${GLM_SOURCE_DIR}                 # GLM headers
-    "${IMGUI_DIR}"                    # ImGui core headers (where imgui.h, imconfig.h, imgui_internal.h are)
-    "${IMGUI_DIR}/backends"           # ImGui backend headers
 )
 
 # Ensure stb_image is defined
