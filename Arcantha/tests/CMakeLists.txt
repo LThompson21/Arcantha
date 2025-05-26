@@ -46,25 +46,25 @@ target_include_directories(test_glm PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../exte
 
 
 # Test ImGui
-# add_executable(test_imgui test_imgui.cpp)
-# target_link_libraries(test_imgui PRIVATE ImGui glfw glad) # ImGui often needs GLFW/OpenGL backends, so link them.
+add_executable(test_imgui test_imgui.cpp)
+target_link_libraries(test_imgui PRIVATE ImGui glfw glad) # ImGui often needs GLFW/OpenGL backends, so link them.
 
 # --- Platform-specific linking ---
 # These are still necessary for the test executables as they are new executables.
 if(WIN32)
     target_link_libraries(test_glfw PRIVATE gdi32 opengl32)
     target_link_libraries(test_glad PRIVATE opengl32)
-    # target_link_libraries(test_imgui PRIVATE gdi32 opengl32)
+    target_link_libraries(test_imgui PRIVATE gdi32 opengl32)
 endif()
 
 if(UNIX AND NOT APPLE)
     find_package(X11 REQUIRED)
     target_link_libraries(test_glfw PRIVATE X11::X11 Xrandr Xi GL)
     target_link_libraries(test_glad PRIVATE GL)
-    # target_link_libraries(test_imgui PRIVATE X11::X11 Xrandr Xi GL)
+    target_link_libraries(test_imgui PRIVATE X11::X11 Xrandr Xi GL)
 endif()
 
 # Optional: Set C++ standard for tests
-set_property(TARGET test_glfw test_glad test_openal test_box2d test_stb_image test_glm PROPERTY CXX_STANDARD 17) # test_imgui
-set_property(TARGET test_glfw test_glad test_openal test_box2d test_stb_image test_glm PROPERTY CXX_STANDARD_REQUIRED ON) # test_imgui
-set_property(TARGET test_glfw test_glad test_openal test_box2d test_stb_image test_glm PROPERTY CXX_EXTENSIONS OFF) # test_imgui
+set_property(TARGET test_glfw test_glad test_openal test_box2d test_stb_image test_glm test_imgui PROPERTY CXX_STANDARD 17)
+set_property(TARGET test_glfw test_glad test_openal test_box2d test_stb_image test_glm test_imgui PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET test_glfw test_glad test_openal test_box2d test_stb_image test_glm test_imgui PROPERTY CXX_EXTENSIONS OFF)
