@@ -1,8 +1,4 @@
-// external/std
 #include <iostream>
-
-// internal
-
 
 int main()
 {

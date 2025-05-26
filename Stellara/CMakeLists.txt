@@ -1,11 +1,11 @@
 ﻿# Stellara/CMakeLists.txt
 cmake_minimum_required(VERSION 3.10)
-project(Stellara LANGUAGES CXX)
+project(Stellara LANGUAGES CXX C)
 
 # Stellara/
 # ├── CMakeLists.txt
 # ├── external/
-# │   ├── box2d-3.1.0/
+# │   ├── box2d-2.4.2/
 # │   ├── glad/
 # │   ├── glfw-3.4/
 # │   ├── glm-1.0.1/
@@ -16,6 +16,10 @@ project(Stellara LANGUAGES CXX)
 # │   ├── cpp/
 # │   ├── include/
 # │   └── main.cpp
+# ├── tests/
+# │   ├── CMakeLists.txt
+# │   ├── test_XXXX.cpp   
+# │   └── ...
 
 # Define the source and include directories for your project
 set(STELLARA_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/cpp")
@@ -46,7 +50,12 @@ set(ALSOFT_EMBED_CORE_DATA ON CACHE BOOL "" FORCE) # Embed default configuration
 add_subdirectory(${OPENAL_SOFT_SOURCE_DIR})
 
 # --- Box2D Setup ---
-set(BOX2D_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/box2d-3.1.0")
+set(BOX2D_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/box2d-2.4.2")
+# Prevent Box2D from building its examples or tests, which often depend on
+# rendering libraries like GLFW, GLAD, and ImGui, avoiding potential conflicts
+# with your main project's direct linking to these libraries.
+set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "Disable Box2D unit tests" FORCE)
+set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "Disable Box2D testbed" FORCE)
 add_subdirectory(${BOX2D_SOURCE_DIR})
 
 # --- stb_image Setup ---
@@ -79,24 +88,25 @@ target_include_directories(ImGui PUBLIC
 # --- Executable Setup ---
 add_executable(Stellara
     src/main.cpp
-    ${STELLARA_SRC_DIR}/source.cpp # Example: Add other source files here
+    #${STELLARA_SRC_DIR}/source.cpp # Example: Add other source files here
 )
 
 # Link GLFW, GLAD, OpenAL, Box2D, and ImGui to your executable
-target_link_libraries(Stellara PRIVATE glfw glad OpenAL Box2D ImGui)
+target_link_libraries(Stellara PUBLIC glfw glad OpenAL box2d ImGui)
 
 # Tell the compiler to look for headers in your project's include directory
-target_include_directories(Stellara PRIVATE
+target_include_directories(Stellara PUBLIC
     ${STELLARA_INCLUDE_DIR}           # Your project's headers
     ${GLFW_SOURCE_DIR}/include        # GLFW headers
     ${GLAD_SOURCE_DIR}/include        # GLAD headers
     ${OPENAL_SOFT_SOURCE_DIR}/include # OpenAL Soft headers
     ${STB_DIR}                        # stb_image headers
     ${GLM_SOURCE_DIR}                 # GLM headers
+    ${BOX2D_SOURCE_DIR}/include       # box2d headers
 )
 
 # Ensure stb_image is defined
-target_compile_definitions(Stellara PRIVATE STB_IMAGE_IMPLEMENTATION)
+target_compile_definitions(Stellara PUBLIC STB_IMAGE_IMPLEMENTATION)
 
 # Optional: Set C++ standard (e.g., C++17)
 set_property(TARGET Stellara PROPERTY CXX_STANDARD 17)
@@ -105,12 +115,15 @@ set_property(TARGET Stellara PROPERTY CXX_EXTENSIONS OFF)
 
 # --- Platform-specific considerations for OpenGL linking ---
 if(WIN32)
-    target_link_libraries(Stellara PRIVATE gdi32 opengl32)
+    target_link_libraries(Stellara PUBLIC gdi32 opengl32)
 endif()
 
 if(UNIX AND NOT APPLE) # Linux specific
     find_package(X11 REQUIRED)
-    target_link_libraries(Stellara PRIVATE X11::X11 Xrandr Xi GL)
+    target_link_libraries(Stellara PUBLIC X11::X11 Xrandr Xi GL)
 endif()
 
 # Note: OpenAL Soft's CMake will handle its own platform-specific linking (e.g., WinMM on Windows, ALSA/PulseAudio on Linux).
+
+# --- Add the tests subdirectory ---
+add_subdirectory(tests)
