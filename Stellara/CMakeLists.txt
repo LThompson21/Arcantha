@@ -20,7 +20,7 @@ target_include_directories(glad PUBLIC
 )
 
 # --- OpenAL Soft Setup ---
-set(OPENAL_SOFT_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/openal-soft-1.23.1") # Adjust version
+set(OPENAL_SOFT_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/openal-soft-1.24.0") # Adjust version
 # OpenAL Soft has its own CMake options; you might want to disable some
 # features you don't need to reduce build time/binary size.
 # For example, to build as a static library (common for games):
@@ -30,6 +30,9 @@ set(ALSOFT_BUILD_TESTS OFF CACHE BOOL "" FORCE)   # Disable tests
 set(ALSOFT_EMBED_CORE_DATA ON CACHE BOOL "" FORCE) # Embed default configuration
 add_subdirectory(${OPENAL_SOFT_SOURCE_DIR})
 
+# --- Box2D Setup ---
+set(BOX2D_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/Box2D")
+add_subdirectory(${BOX2D_SOURCE_DIR})
 
 # --- Executable Setup ---
 add_executable(Stellara
@@ -38,7 +41,7 @@ add_executable(Stellara
 )
 
 # Link GLFW, GLAD, and OpenAL to your executable
-target_link_libraries(Stellara PRIVATE glfw glad OpenAL) # The target name from OpenAL Soft's CMake is typically 'OpenAL'
+target_link_libraries(Stellara PRIVATE glfw glad OpenAL Box2D) # The target name from OpenAL Soft's CMake is typically 'OpenAL'
 
 # Tell the compiler to look for headers in your project's include directory
 target_include_directories(Stellara PRIVATE
