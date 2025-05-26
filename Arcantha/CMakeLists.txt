@@ -1,8 +1,8 @@
-﻿# Stellara/CMakeLists.txt
+﻿# Arcantha/CMakeLists.txt
 cmake_minimum_required(VERSION 3.10)
-project(Stellara LANGUAGES CXX C)
+project(Arcantha LANGUAGES CXX C)
 
-# Stellara/
+# Arcantha/
 # ├── CMakeLists.txt
 # ├── external/
 # │   ├── box2d-2.4.2/
@@ -22,8 +22,8 @@ project(Stellara LANGUAGES CXX C)
 # │   └── ...
 
 # Define the source and include directories for your project
-set(STELLARA_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/cpp")
-set(STELLARA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/include")
+set(Arcantha_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/cpp")
+set(Arcantha_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/include")
 
 # --- GLFW Setup ---
 set(GLFW_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/glfw-3.4")
@@ -83,20 +83,22 @@ add_library(ImGui STATIC ${IMGUI_SOURCES})
 target_include_directories(ImGui PUBLIC
     "${IMGUI_DIR}"
     "${IMGUI_DIR}/backends"
+    "${GLFW_SOURCE_DIR}/include"
+    "${GLAD_SOURCE_DIR}/include"
 )
 
 # --- Executable Setup ---
-add_executable(Stellara
+add_executable(Arcantha
     src/main.cpp
-    #${STELLARA_SRC_DIR}/source.cpp # Example: Add other source files here
+    #${Arcantha_SRC_DIR}/source.cpp # Example: Add other source files here
 )
 
 # Link GLFW, GLAD, OpenAL, Box2D, and ImGui to your executable
-target_link_libraries(Stellara PUBLIC glfw glad OpenAL box2d ImGui)
+target_link_libraries(Arcantha PUBLIC glfw glad OpenAL box2d ImGui)
 
 # Tell the compiler to look for headers in your project's include directory
-target_include_directories(Stellara PUBLIC
-    ${STELLARA_INCLUDE_DIR}           # Your project's headers
+target_include_directories(Arcantha PUBLIC
+    ${Arcantha_INCLUDE_DIR}           # Your project's headers
     ${GLFW_SOURCE_DIR}/include        # GLFW headers
     ${GLAD_SOURCE_DIR}/include        # GLAD headers
     ${OPENAL_SOFT_SOURCE_DIR}/include # OpenAL Soft headers
@@ -106,21 +108,21 @@ target_include_directories(Stellara PUBLIC
 )
 
 # Ensure stb_image is defined
-target_compile_definitions(Stellara PUBLIC STB_IMAGE_IMPLEMENTATION)
+target_compile_definitions(Arcantha PUBLIC STB_IMAGE_IMPLEMENTATION)
 
 # Optional: Set C++ standard (e.g., C++17)
-set_property(TARGET Stellara PROPERTY CXX_STANDARD 17)
-set_property(TARGET Stellara PROPERTY CXX_STANDARD_REQUIRED ON)
-set_property(TARGET Stellara PROPERTY CXX_EXTENSIONS OFF)
+set_property(TARGET Arcantha PROPERTY CXX_STANDARD 17)
+set_property(TARGET Arcantha PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET Arcantha PROPERTY CXX_EXTENSIONS OFF)
 
 # --- Platform-specific considerations for OpenGL linking ---
 if(WIN32)
-    target_link_libraries(Stellara PUBLIC gdi32 opengl32)
+    target_link_libraries(Arcantha PUBLIC gdi32 opengl32)
 endif()
 
 if(UNIX AND NOT APPLE) # Linux specific
     find_package(X11 REQUIRED)
-    target_link_libraries(Stellara PUBLIC X11::X11 Xrandr Xi GL)
+    target_link_libraries(Arcantha PUBLIC X11::X11 Xrandr Xi GL)
 endif()
 
 # Note: OpenAL Soft's CMake will handle its own platform-specific linking (e.g., WinMM on Windows, ALSA/PulseAudio on Linux).

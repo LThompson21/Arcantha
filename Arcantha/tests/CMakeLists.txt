@@ -1,9 +1,9 @@
-# Stellara/tests/CMakeLists.txt
+# Arcantha/tests/CMakeLists.txt
 
 # Do NOT include the parent CMakeLists.txt.
 # We are already in a subdirectory added by the parent, so its targets are available.
 
-project(Stellara_Tests LANGUAGES CXX C)
+project(Arcantha_Tests LANGUAGES CXX C)
 
 # --- Test Executables ---
 
@@ -25,16 +25,16 @@ target_link_libraries(test_openal PRIVATE OpenAL) # 'OpenAL' target is available
 
 # Test Box2D
 add_executable(test_box2d test_box2d.cpp)
-target_link_libraries(test_box2d PRIVATE box2d) # 'Box2D' target is available from parent
+target_link_libraries(test_box2d PRIVATE box2d glfw ImGui) # 'Box2D' target is available from parent
 
 # Test stb_image
 # add_executable(test_stb_image test_stb_image.cpp)
 # target_compile_definitions(test_stb_image PRIVATE STB_IMAGE_IMPLEMENTATION)
-# The parent 'Stellara' target sets up STB_DIR and include paths.
+# The parent 'Arcantha' target sets up STB_DIR and include paths.
 # If test_stb_image needs these includes, you can either:
-# 1. Link against the 'Stellara' target (if 'Stellara' exposes includes publicly, not recommended for tests)
+# 1. Link against the 'Arcantha' target (if 'Arcantha' exposes includes publicly, not recommended for tests)
 # 2. Explicitly add the include directory here (preferred for tests if not exposed PUBLICly by library targets)
-# Let's assume the parent's 'target_include_directories' for Stellara handles this broadly.
+# Let's assume the parent's 'target_include_directories' for Arcantha handles this broadly.
 # If not, you might need to add:
 # target_include_directories(test_stb_image PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../external/stb")
 
