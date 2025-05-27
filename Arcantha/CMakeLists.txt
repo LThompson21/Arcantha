@@ -1,4 +1,4 @@
-﻿# Arcantha/CMakeLists.txt
+# Arcantha/CMakeLists.txt
 cmake_minimum_required(VERSION 3.10)
 project(Arcantha LANGUAGES CXX C)
 
@@ -89,9 +89,9 @@ target_include_directories(ImGui PUBLIC
 )
 
 # --- Executable Setup ---
-add_executable(Arcantha
-    src/main.cpp
-    #${Arcantha_SRC_DIR}/source.cpp # Example: Add other source files here
+add_executable(Arcantha "src/main.cpp"
+    "src/include/Application.h" "src/cpp/Application.cpp"
+    "src/include/Window.h" "src/cpp/Window.cpp"
 )
 
 # Link GLFW, GLAD, OpenAL, Box2D, and ImGui to your executable
@@ -109,7 +109,7 @@ target_include_directories(Arcantha PUBLIC
 )
 
 # Ensure stb_image is defined
-target_compile_definitions(Arcantha PUBLIC STB_IMAGE_IMPLEMENTATION)
+target_compile_definitions(Arcantha PUBLIC STB_IMAGE_IMPLEMENTATION GLFW_INCLUDE_NONE)
 
 # Optional: Set C++ standard (e.g., C++17)
 set_property(TARGET Arcantha PROPERTY CXX_STANDARD 17)
