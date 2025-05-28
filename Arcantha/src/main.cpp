@@ -2,6 +2,6 @@
 #include "Application.h"
 
 int main() {
-	Application& app = Application::get();
+	Application& app = Application::getInstance();
 	app.run();
 }

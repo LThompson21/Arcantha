@@ -7,13 +7,15 @@
 #include "Window.h"
 #include "glfwListener.h"
 
-Window::Window( int width, int height, glm::vec4 clear, const std::string& title,
+Window::Window( const int width, const int height, glm::vec4 clear, const std::string& title,
 	bool maximizeOnStart, bool resizeable ) :
 	width( width ), height( height ), clear( clear ), title( title ), window( nullptr ),
 	maximizeOnStart( maximizeOnStart ), resizeable( resizeable ) {}
 
 void Window::init() {
-	glfwSetErrorCallback( Callback::glfwError );
+	glfwSetErrorCallback( []( int error, const char* description ) {
+		std::cerr << "Err: " << error << " | " << description << std::endl;
+	} );
 
 	if ( !glfwInit() ) {
 		std::cerr << "Err: Failure to initialize GLFW." << std::endl;
@@ -32,11 +34,15 @@ void Window::init() {
 	}
 	glfwSetWindowUserPointer( this->window, this );
 
-	glfwSetWindowSizeCallback( this->window, Callback::glfwWindowSize );
-	glfwSetKeyCallback( this->window, Key::callback );
-	glfwSetCursorPosCallback( this->window, Mouse::posCallback );
-	glfwSetMouseButtonCallback( this->window, Mouse::buttonCallback );
-	glfwSetScrollCallback( this->window, Mouse::scrollCallback );
+	glfwSetWindowSizeCallback( this->window, []( GLFWwindow* window, int w, int h ) {
+		Window* windowInstance = static_cast< Window* >( glfwGetWindowUserPointer( window ) );
+		if ( windowInstance ) {
+			windowInstance->setWidth( w );
+			windowInstance->setHeight( h );
+
+			glViewport( 0, 0, w, h );
+		}
+	} );
 
 	glfwMakeContextCurrent( window );
 	gladLoadGLLoader( ( GLADloadproc ) glfwGetProcAddress );
@@ -50,8 +56,6 @@ void Window::init() {
 }
 
 void Window::update() {
-	glfwPollEvents();
-
 	glClearColor( clear.x, clear.y, clear.z, clear.w );
 	glClear( GL_COLOR_BUFFER_BIT );
 
@@ -63,8 +67,16 @@ void Window::shutdown() {
 	glfwTerminate();
 }
 
-bool Window::shouldClose() {
+bool Window::shouldClose() const {
 	return glfwWindowShouldClose( window );
+}
+
+void Window::setShouldClose( bool close ) {
+	glfwSetWindowShouldClose( window, close );
+}
+
+GLFWwindow* Window::getGLFWwindow() const {
+	return this->window;
 }
 
 int Window::getWidth() const {

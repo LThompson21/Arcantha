@@ -7,13 +7,13 @@
 class Application
 {
 public:
-	static Application& get();
+	static Application& getInstance();
 	void run();
 
 private:
 	static Application instance;
 
-	Window& mainWindow;
+	Window mainWindow;
 
 	Application();
 	~Application() = default;
