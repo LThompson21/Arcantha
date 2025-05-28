@@ -2,6 +2,6 @@
 #include "Application.h"
 
 int main() {
-	Application& app = Application::Get();
-	app.Run();
+	Application& app = Application::get();
+	app.run();
 }

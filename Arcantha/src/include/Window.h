@@ -2,24 +2,30 @@
 
 #include <string>
 
-#include <glm/ext/vector_float4.hpp>
+#include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
 
 class Window
 {
 public:
-	Window( int w, int h, glm::vec4 clear, const std::string& title, bool maximize, bool resizeable );
+	Window( int width, int height, glm::vec4 clear, const std::string& title, bool maximizeOnStart, bool resizeable );
 	~Window() = default;
 
-	void Init();
-	void Update();
-	void Shutdown();
+	void init();
+	void update();
+	void shutdown();
 
-	bool ShouldClose();
+	bool shouldClose();
+
+	int getWidth() const;
+	int getHeight() const;
+
+	void setWidth( const int width );
+	void setHeight( const int height );
 
 private:
 	GLFWwindow* window;
-	int w, h;
+	int width, height;
 	glm::vec4 clear;
 	const std::string title;
 	bool maximizeOnStart, resizeable;

@@ -7,8 +7,8 @@
 class Application
 {
 public:
-	static Application& Get();
-	void Run();
+	static Application& get();
+	void run();
 
 private:
 	static Application instance;
@@ -18,9 +18,9 @@ private:
 	Application();
 	~Application() = default;
 
-	void Init();
-	void Loop();
-	void Shutdown();
+	void init();
+	void loop();
+	void shutdown();
 
-	void Update( double dt );
+	void update( double dt );
 };

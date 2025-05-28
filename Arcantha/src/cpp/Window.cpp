@@ -5,32 +5,38 @@
 #include <GLFW/glfw3.h>
 
 #include "Window.h"
+#include "glfwListener.h"
 
-static void glfwErrorCallback( int error, const char* description ) {
-	std::cerr << "Err: " << description << std::endl;
-}
+Window::Window( int width, int height, glm::vec4 clear, const std::string& title,
+	bool maximizeOnStart, bool resizeable ) :
+	width( width ), height( height ), clear( clear ), title( title ), window( nullptr ),
+	maximizeOnStart( maximizeOnStart ), resizeable( resizeable ) {}
 
-Window::Window( int w, int h, glm::vec4 clear, const std::string& title, bool maximizeOnStart, bool resizeable ) :
-	w( w ), h( h ), clear( clear ), title( title ), window( nullptr ), maximizeOnStart( maximizeOnStart ), resizeable( resizeable ) {}
+void Window::init() {
+	glfwSetErrorCallback( Callback::glfwError );
 
-void Window::Init() {
 	if ( !glfwInit() ) {
 		std::cerr << "Err: Failure to initialize GLFW." << std::endl;
 		exit( -1 );
 	}
-
-	glfwSetErrorCallback( glfwErrorCallback );
 
 	glfwDefaultWindowHints();
 	glfwWindowHint( GLFW_VISIBLE, GLFW_FALSE );
 	glfwWindowHint( GLFW_RESIZABLE, resizeable ? GLFW_TRUE : GLFW_FALSE );
 	glfwWindowHint( GLFW_MAXIMIZED, maximizeOnStart ? GLFW_TRUE : GLFW_FALSE );
 
-	this->window = glfwCreateWindow( w, h, title.c_str(), NULL, NULL );
+	this->window = glfwCreateWindow( this->width, this->height, this->title.c_str(), NULL, NULL );
 	if ( !window ) {
 		std::cerr << "Err: Failure to create GLFW window." << std::endl;
 		exit( -2 );
 	}
+	glfwSetWindowUserPointer( this->window, this );
+
+	glfwSetWindowSizeCallback( this->window, Callback::glfwWindowSize );
+	glfwSetKeyCallback( this->window, Key::callback );
+	glfwSetCursorPosCallback( this->window, Mouse::posCallback );
+	glfwSetMouseButtonCallback( this->window, Mouse::buttonCallback );
+	glfwSetScrollCallback( this->window, Mouse::scrollCallback );
 
 	glfwMakeContextCurrent( window );
 	gladLoadGLLoader( ( GLADloadproc ) glfwGetProcAddress );
@@ -43,7 +49,7 @@ void Window::Init() {
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 }
 
-void Window::Update() {
+void Window::update() {
 	glfwPollEvents();
 
 	glClearColor( clear.x, clear.y, clear.z, clear.w );
@@ -52,11 +58,27 @@ void Window::Update() {
 	glfwSwapBuffers( window );
 }
 
-void Window::Shutdown() {
+void Window::shutdown() {
 	glfwDestroyWindow( window );
 	glfwTerminate();
 }
 
-bool Window::ShouldClose() {
+bool Window::shouldClose() {
 	return glfwWindowShouldClose( window );
+}
+
+int Window::getWidth() const {
+	return this->width;
+}
+
+int Window::getHeight() const {
+	return this->height;
+}
+
+void Window::setWidth( const int width ) {
+	this->width = width;
+}
+
+void Window::setHeight( const int height ) {
+	this->height = height;
 }

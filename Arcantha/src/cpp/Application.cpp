@@ -4,30 +4,30 @@
 
 Application Application::instance;
 
-Application::Application()
-	: mainWindow( *( new Window( 1920, 1080, glm::vec4( 1, 1, 1, 1 ), "Arcantha", true, true ) ) ) {}
+Application::Application() :
+	mainWindow( *( new Window( 800, 600, glm::vec4( .75, .5, 1, 1 ), "Arcantha", false, true ) ) ) {}
 
-Application& Application::Get() {
+Application& Application::get() {
 	return instance;
 }
 
-void Application::Run() {
-	Init();
-	Loop();
-	Shutdown();
+void Application::run() {
+	init();
+	loop();
+	shutdown();
 }
 
-void Application::Init() {
-	mainWindow.Init();
+void Application::init() {
+	mainWindow.init();
 }
 
-void Application::Loop() {
+void Application::loop() {
 	double dt = -1;
 	double frameBegin = glfwGetTime();
 	double frameEnd;
 
-	while ( !mainWindow.ShouldClose() ) {
-		Update(dt);
+	while ( !mainWindow.shouldClose() ) {
+		update( dt );
 
 		frameEnd = glfwGetTime();
 		dt = frameEnd - frameBegin;
@@ -35,12 +35,12 @@ void Application::Loop() {
 	}
 }
 
-void Application::Shutdown() {
-	mainWindow.Shutdown();
+void Application::shutdown() {
+	mainWindow.shutdown();
 };
 
-void Application::Update( double dt ) {
+void Application::update( double dt ) {
 	if ( dt <= 0 ) return;
 
-	mainWindow.Update();
+	mainWindow.update();
 }
