@@ -22,5 +22,5 @@ private:
 	void Loop();
 	void Shutdown();
 
-	void Update(float dt);
+	void Update( double dt );
 };

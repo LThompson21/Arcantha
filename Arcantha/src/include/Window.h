@@ -8,7 +8,7 @@
 class Window
 {
 public:
-	Window( int w, int h, glm::vec4 clear, const std::string& title );
+	Window( int w, int h, glm::vec4 clear, const std::string& title, bool maximize, bool resizeable );
 	~Window() = default;
 
 	void Init();
@@ -22,4 +22,5 @@ private:
 	int w, h;
 	glm::vec4 clear;
 	const std::string title;
+	bool maximizeOnStart, resizeable;
 };

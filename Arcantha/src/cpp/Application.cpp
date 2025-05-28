@@ -5,7 +5,7 @@
 Application Application::instance;
 
 Application::Application()
-	: mainWindow( *( new Window( 1920, 1080, glm::vec4( 1, 1, 1, 1 ), "Arcantha" ) ) ) {}
+	: mainWindow( *( new Window( 1920, 1080, glm::vec4( 1, 1, 1, 1 ), "Arcantha", true, true ) ) ) {}
 
 Application& Application::Get() {
 	return instance;
@@ -22,12 +22,16 @@ void Application::Init() {
 }
 
 void Application::Loop() {
-	float dt = -1;
-	long frameBegin = glfwGetTime();
-	long frameEnd;
+	double dt = -1;
+	double frameBegin = glfwGetTime();
+	double frameEnd;
 
 	while ( !mainWindow.ShouldClose() ) {
-		
+		Update(dt);
+
+		frameEnd = glfwGetTime();
+		dt = frameEnd - frameBegin;
+		frameBegin = frameEnd;
 	}
 }
 
@@ -35,7 +39,7 @@ void Application::Shutdown() {
 	mainWindow.Shutdown();
 };
 
-void Application::Update(float dt) {
+void Application::Update( double dt ) {
 	if ( dt <= 0 ) return;
 
 	mainWindow.Update();

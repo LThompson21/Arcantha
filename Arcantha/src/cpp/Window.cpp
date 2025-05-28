@@ -10,8 +10,8 @@ static void glfwErrorCallback( int error, const char* description ) {
 	std::cerr << "Err: " << description << std::endl;
 }
 
-Window::Window( int w, int h, glm::vec4 clear, const std::string& title )
-	: w( w ), h( h ), clear( clear ), title( title ), window( nullptr ) {}
+Window::Window( int w, int h, glm::vec4 clear, const std::string& title, bool maximizeOnStart, bool resizeable ) :
+	w( w ), h( h ), clear( clear ), title( title ), window( nullptr ), maximizeOnStart( maximizeOnStart ), resizeable( resizeable ) {}
 
 void Window::Init() {
 	if ( !glfwInit() ) {
@@ -23,8 +23,8 @@ void Window::Init() {
 
 	glfwDefaultWindowHints();
 	glfwWindowHint( GLFW_VISIBLE, GLFW_FALSE );
-	glfwWindowHint( GLFW_RESIZABLE, GLFW_TRUE );
-	glfwWindowHint( GLFW_MAXIMIZED, GLFW_TRUE );
+	glfwWindowHint( GLFW_RESIZABLE, resizeable ? GLFW_TRUE : GLFW_FALSE );
+	glfwWindowHint( GLFW_MAXIMIZED, maximizeOnStart ? GLFW_TRUE : GLFW_FALSE );
 
 	this->window = glfwCreateWindow( w, h, title.c_str(), NULL, NULL );
 	if ( !window ) {
@@ -46,7 +46,7 @@ void Window::Init() {
 void Window::Update() {
 	glfwPollEvents();
 
-	glClearColor(clear.x, clear.y, clear.z, clear.w);
+	glClearColor( clear.x, clear.y, clear.z, clear.w );
 	glClear( GL_COLOR_BUFFER_BIT );
 
 	glfwSwapBuffers( window );
