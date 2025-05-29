@@ -89,7 +89,7 @@ A central theme in Arcantha is the recurring cycle of rebellion against the God-
 Arcantha is planned with a robust technical foundation to support its dynamic gameplay and rich world. The choice of C++ and specialized libraries aims for performance and flexibility.
 
 * **Language:** C++
-* **Windowing:** GLFW & OpenGL
+* **Windowing/Graphics:** GLFW & OpenGL
 * **Physics:** Box2D
 * **Audio:** OpenAL
 * **Debug GUI:** Dear ImGui
