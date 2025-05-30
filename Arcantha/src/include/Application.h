@@ -3,6 +3,7 @@
 #include <string> // Required for std::string operations.
 
 #include "Window.h" // Includes the Window class definition, which Application depends on.
+#include "Input.h"
 
 /**
  * @brief The Application class represents the main application instance.
@@ -31,11 +32,12 @@ private:
 	static Application instance; // The single instance of the Application class, implementing the Singleton pattern.
 
 	Window mainWindow; // The main window of the application.
+	EventDispatcher& eventDispatcher;
 
 	/**
 	 * @brief Private constructor to enforce Singleton pattern.
 	 *
-	 * Initializes the mainWindow with default dimensions (800x600), clear color (purple-ish), title "Arcantha",
+	 * Initializes the mainWindow with default dimensions (800x600), clear color (white), title "Arcantha",
 	 * and window properties (not maximized on start, resizeable).
 	 */
 	Application();

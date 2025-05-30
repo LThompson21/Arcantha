@@ -1,5 +1,85 @@
-#include "InputManager.h" // Includes the InputManager class definition.
-#include <iostream> // Required for std::cout for debugging purposes.
+#include "Input.h" // Includes the InputManager class definition.
+
+ListenerID EventDispatcher::addKeyListener( std::function<void( KeyEvent& )> func ) {
+	ListenerID id = nextID++;
+
+	keyListeners.emplace( id, func );
+
+	return id;
+}
+
+ListenerID EventDispatcher::addMouseButtonListener( std::function<void( MouseButtonEvent& )> func ) {
+	ListenerID id = nextID++;
+
+	mouseButtonListeners.emplace( id, func );
+
+	return id;
+}
+
+ListenerID EventDispatcher::addMouseMoveListener( std::function<void( MouseMoveEvent& )> func ) {
+	ListenerID id = nextID++;
+
+	mouseMoveListeners.emplace( id, func );
+
+	return id;
+}
+
+ListenerID EventDispatcher::addMouseScrollListener( std::function<void( MouseScrollEvent& )> func ) {
+	ListenerID id = nextID++;
+
+	mouseScrollListeners.emplace( id, func );
+
+	return id;
+}
+
+bool EventDispatcher::removeKeyListener( ListenerID id ) {
+	if ( keyListeners.find( id ) == keyListeners.end() ) return false;
+
+	keyListeners.erase( id );
+	return true;
+}
+
+bool EventDispatcher::removeMouseButtonListener( ListenerID id ) {
+	if ( mouseButtonListeners.find( id ) == mouseButtonListeners.end() ) return false;
+
+	mouseButtonListeners.erase( id );
+	return true;
+}
+
+bool EventDispatcher::removeMouseMoveListener( ListenerID id ) {
+	if ( mouseMoveListeners.find( id ) == mouseMoveListeners.end() ) return false;
+
+	mouseMoveListeners.erase( id );
+	return true;
+}
+
+bool EventDispatcher::removeMouseScrollListener( ListenerID id ) {
+	if ( mouseScrollListeners.find( id ) == mouseScrollListeners.end() ) return false;
+
+	mouseScrollListeners.erase( id );
+	return true;
+}
+
+void EventDispatcher::dispatch( KeyEvent& event ) const {
+	for ( const auto& listener : keyListeners ) {
+		if ( !event.consumed ) listener.second( event );
+	}
+}
+void EventDispatcher::dispatch( MouseButtonEvent& event ) const {
+	for ( const auto& listener : mouseButtonListeners ) {
+		if ( !event.consumed ) listener.second( event );
+	}
+}
+void EventDispatcher::dispatch( MouseMoveEvent& event ) const {
+	for ( const auto& listener : mouseMoveListeners ) {
+		if ( !event.consumed ) listener.second( event );
+	}
+}
+void EventDispatcher::dispatch( MouseScrollEvent& event ) const {
+	for ( const auto& listener : mouseScrollListeners ) {
+		if ( !event.consumed ) listener.second( event );
+	}
+}
 
 InputManager InputManager::instance; // Definition and initialization of the static singleton instance.
 
@@ -182,12 +262,15 @@ bool InputManager::isMouseDragging() const {
  * @param mods Modifier flags.
  */
 void InputManager::glfwKeyCallback( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	( void* ) window;
+
 	if ( key >= 0 && key <= GLFW_KEY_LAST ) { // Ensure the key code is within the valid range.
 		// Update the current state of the key. It's pressed if action is PRESS or REPEAT.
 		InputManager::getInstance().currentKeyStates[ key ] = ( action == GLFW_PRESS || action == GLFW_REPEAT );
 
 		// Dispatch a KeyEvent to all registered key listeners.
-		InputManager::getInstance().dispatcher.dispatch( KeyEvent{ {}, key, scancode, action, mods } );
+		KeyEvent ke{ {}, key, scancode, action, mods };
+		InputManager::getInstance().dispatcher.dispatch( ke );
 	}
 }
 
@@ -201,6 +284,8 @@ void InputManager::glfwKeyCallback( GLFWwindow* window, int key, int scancode, i
  * @param yPos The new Y-coordinate of the cursor.
  */
 void InputManager::glfwCursorPosCallback( GLFWwindow* window, double xPos, double yPos ) {
+	( void* ) window;
+
 	InputManager::getInstance().currentMouseX = xPos; // Update current mouse X position.
 	InputManager::getInstance().currentMouseY = yPos; // Update current mouse Y position.
 
@@ -215,8 +300,8 @@ void InputManager::glfwCursorPosCallback( GLFWwindow* window, double xPos, doubl
 	InputManager::getInstance().mouseDragging = anyButtonDown; // Set mouseDragging flag.
 
 	// Dispatch a MouseMoveEvent, including the calculated delta.
-	InputManager::getInstance().dispatcher.dispatch( MouseMoveEvent{ {}, xPos, yPos,
-		xPos - InputManager::getInstance().lastMouseX, yPos - InputManager::getInstance().lastMouseY } );
+	MouseMoveEvent mme{ {}, xPos, yPos,	xPos - InputManager::getInstance().lastMouseX, yPos - InputManager::getInstance().lastMouseY };
+	InputManager::getInstance().dispatcher.dispatch( mme );
 }
 
 /**
@@ -230,6 +315,8 @@ void InputManager::glfwCursorPosCallback( GLFWwindow* window, double xPos, doubl
  * @param mods Modifier flags.
  */
 void InputManager::glfwMouseButtonCallback( GLFWwindow* window, int button, int action, int mods ) {
+	( void* ) window;
+
 	if ( button >= 0 && button <= GLFW_MOUSE_BUTTON_LAST ) { // Ensure the button code is within valid range.
 		// Update the current state of the mouse button. It's pressed if action is PRESS.
 		InputManager::getInstance().currentMouseButtonStates[ button ] = ( action == GLFW_PRESS );
@@ -240,8 +327,9 @@ void InputManager::glfwMouseButtonCallback( GLFWwindow* window, int button, int 
 			InputManager::getInstance().isMouseButtonPressed( 2 );
 
 		// Dispatch a MouseButtonEvent, including current mouse position.
-		InputManager::getInstance().dispatcher.dispatch( MouseButtonEvent{ {}, button, action, mods,
-			InputManager::getInstance().currentMouseX, InputManager::getInstance().currentMouseY } );
+		MouseButtonEvent mbe{ {}, button, action, mods,
+			InputManager::getInstance().currentMouseX, InputManager::getInstance().currentMouseY };
+		InputManager::getInstance().dispatcher.dispatch( mbe );
 	}
 }
 
@@ -254,9 +342,12 @@ void InputManager::glfwMouseButtonCallback( GLFWwindow* window, int button, int 
  * @param yOffset The scroll offset along the Y axis.
  */
 void InputManager::glfwScrollCallback( GLFWwindow* window, double xOffset, double yOffset ) {
+	( void* ) window;
+
 	InputManager::getInstance().scrollXOffset = xOffset; // Update horizontal scroll offset.
 	InputManager::getInstance().scrollYOffset = yOffset; // Update vertical scroll offset.
 
 	// Dispatch a MouseScrollEvent.
-	InputManager::getInstance().dispatcher.dispatch( MouseScrollEvent{ {}, xOffset, yOffset } );
+	MouseScrollEvent mse{ {}, xOffset, yOffset };
+	InputManager::getInstance().dispatcher.dispatch( mse );
 }

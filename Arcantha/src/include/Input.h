@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h> // Includes GLFW library for input handling functions and constants.
 #include <glm/glm.hpp> // Includes GLM for vector types like glm::vec2, used for positions and deltas.
 #include <map> // Required for std::map to store key and mouse button states.
+#include <atomic> // Unique Listener ID's
 
 /**
  * @brief Base structure for all input events.
@@ -12,7 +13,7 @@
  */
 struct BaseEvent
 {
-	bool consumable = true; // Indicates if the event can be consumed by a listener, stopping further propagation.
+	bool consumable = true; // Indicates if the event can be consumed by a listener
 	bool consumed = false; // Indicates if the event has already been consumed by a listener.
 };
 
@@ -55,6 +56,8 @@ struct MouseScrollEvent : BaseEvent
 	double xOffset, yOffset; // The scroll offset along the X and Y axes.
 };
 
+
+using ListenerID = unsigned long long;
 /**
  * @brief Manages event listeners and dispatches events.
  *
@@ -65,51 +68,92 @@ struct MouseScrollEvent : BaseEvent
 class EventDispatcher
 {
 public:
-	// Vectors to hold listener functions for different event types.
-	std::vector<std::function<void( const KeyEvent& )>> keyListeners;
-	std::vector<std::function<void( const MouseButtonEvent& )>> mouseButtonListeners;
-	std::vector<std::function<void( const MouseMoveEvent& )>> mouseMoveListeners;
-	std::vector<std::function<void( const MouseScrollEvent& )>> mouseScrollListeners;
+	/**
+	* @brief Registers a listener for KeyEvent's
+	* @param func listener function
+	* @return Unique ID for the listener function (for deregistering)
+	*/
+	ListenerID addKeyListener( std::function<void( KeyEvent& )> func );
+
+	/**
+	* @brief Registers a listener for MouseButtonEvent's
+	* @param func listener function
+	* @return Unique ID for the listener function (for deregistering)
+	*/
+	ListenerID addMouseButtonListener( std::function<void( MouseButtonEvent& )> func );
+
+	/**
+	* @brief Registers a listener for MouseMoveEvent's
+	* @param func listener function
+	* @return Unique ID for the listener function (for deregistering)
+	*/
+	ListenerID addMouseMoveListener( std::function<void( MouseMoveEvent& )> func );
+
+	/**
+	* @brief Registers a listener for MouseScrollEvent's
+	* @param func listener function
+	* @return Unique ID for the listener function (for deregistering)
+	*/
+	ListenerID addMouseScrollListener( std::function<void( MouseScrollEvent& )> func );
+
+	/**
+	* @brief Removes a listener for KeyEvent's
+	* @param id Unique ID for the listener function
+	* @return Bool to indicate success or failure to remove
+	*/
+	bool removeKeyListener( ListenerID id );
+
+	/**
+	* @brief Registers a listener for MouseButtonEvent's
+	* @param id Unique ID for the listener function
+	* @return Bool to indicate success or failure to remove
+	*/
+	bool removeMouseButtonListener( ListenerID id );
+
+	/**
+	* @brief Registers a listener for MouseMoveEvent's
+	* @param id Unique ID for the listener function
+	* @return Bool to indicate success or failure to remove
+	*/
+	bool removeMouseMoveListener( ListenerID id );
+
+	/**
+	* @brief Registers a listener for MouseScrollEvent's
+	* @param id funcUnique ID for the listener function
+	* @return Bool to indicate success or failure to remove
+	*/
+	bool removeMouseScrollListener( ListenerID id );
 
 	/**
 	 * @brief Dispatches a KeyEvent to all registered key listeners.
 	 * @param event The KeyEvent to dispatch.
 	 */
-	void dispatch( const KeyEvent& event ) {
-		for ( const auto& listener : keyListeners ) {
-			listener( event );
-		}
-	}
-
+	void dispatch( KeyEvent& event ) const;
 	/**
 	 * @brief Dispatches a MouseButtonEvent to all registered mouse button listeners.
 	 * @param event The MouseButtonEvent to dispatch.
 	 */
-	void dispatch( const MouseButtonEvent& event ) {
-		for ( const auto& listener : mouseButtonListeners ) {
-			listener( event );
-		}
-	}
-
+	void dispatch( MouseButtonEvent& event ) const;
 	/**
 	 * @brief Dispatches a MouseMoveEvent to all registered mouse move listeners.
 	 * @param event The MouseMoveEvent to dispatch.
 	 */
-	void dispatch( const MouseMoveEvent& event ) {
-		for ( const auto& listener : mouseMoveListeners ) {
-			listener( event );
-		}
-	}
-
+	void dispatch( MouseMoveEvent& event ) const;
 	/**
 	 * @brief Dispatches a MouseScrollEvent to all registered mouse scroll listeners.
 	 * @param event The MouseScrollEvent to dispatch.
 	 */
-	void dispatch( const MouseScrollEvent& event ) {
-		for ( const auto& listener : mouseScrollListeners ) {
-			listener( event );
-		}
-	}
+	void dispatch( MouseScrollEvent& event ) const;
+
+private:
+	// Vectors to hold listener functions for different event types.
+	std::map<ListenerID, std::function<void( KeyEvent& )>> keyListeners;
+	std::map<ListenerID, std::function<void( MouseButtonEvent& )>> mouseButtonListeners;
+	std::map<ListenerID, std::function<void( MouseMoveEvent& )>> mouseMoveListeners;
+	std::map<ListenerID, std::function<void( MouseScrollEvent& )>> mouseScrollListeners;
+
+	// Next Listener ID
+	std::atomic<ListenerID> nextID = 0;
 };
 
 /**

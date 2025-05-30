@@ -105,7 +105,7 @@ target_include_directories(ImGui PUBLIC
 add_executable(Arcantha "src/main.cpp"
     "src/include/Application.h" "src/cpp/Application.cpp"
     "src/include/Window.h" "src/cpp/Window.cpp"
-      "src/include/InputManager.h" "src/cpp/InputManager.cpp")
+    "src/include/Input.h" "src/cpp/Input.cpp")
 
 # Link GLFW, GLAD, OpenAL, Box2D, and ImGui to your executable
 target_link_libraries(Arcantha PUBLIC glfw glad OpenAL box2d ImGui)

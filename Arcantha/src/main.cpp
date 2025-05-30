@@ -9,6 +9,5 @@
  * @return 0 if the application exits successfully.
  */
 int main() {
-	Application& app = Application::getInstance(); // Get the singleton instance of the Application.
-	app.run(); // Run the application, which includes initialization, main loop, and shutdown.
+	Application::getInstance().run();
 }
